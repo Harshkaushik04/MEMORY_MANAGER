@@ -47,9 +47,9 @@ using namespace std;
 //     }
 // };
 
-bool string_keys_checker(unordered_map<string,unsigned long long*> map,string to_check){
+bool string_keys_checker(unordered_map<string,unsigned long*> map,string to_check){
     bool flag=false;
-    for (pair<string,unsigned long long*> pair : map) {
+    for (pair<string,unsigned long*> pair : map) {
         if(pair.first==to_check){
             flag=true;
             return flag;
@@ -81,16 +81,16 @@ bool vec_checker(vector<unsigned long long> vec,unsigned long long to_check){
     return flag;
 }
 
-vector<unsigned long long> physical_frames_numbers(unsigned long long memory_start,unsigned long long memory_end,unsigned long long page_size){
-    vector<unsigned long long> frame_numbers={};
-    long long num_pages=(memory_end-memory_start)/page_size;
-    for(long long i=0;i<num_pages;i++){
+vector<unsigned long> physical_frames_numbers(unsigned long long memory_start,unsigned long long memory_end,unsigned long long page_size){
+    vector<unsigned long> frame_numbers={};
+    long num_pages=(memory_end-memory_start)/page_size;
+    for(long i=0;i<num_pages;i++){
         frame_numbers.push_back(i);
     }
     return frame_numbers;
 }
 
-unsigned long long frames_allocator(vector<unsigned long long>* free_frame_numbers,vector<unsigned long long>* allocated_frame_numbers,unsigned long long memory_to_allocate,unsigned long long frame_size,unsigned long long physical_offset){
+unsigned long long frames_allocator(vector<unsigned long>* free_frame_numbers,vector<unsigned long>* allocated_frame_numbers,unsigned long long memory_to_allocate,unsigned long long frame_size,unsigned long long physical_offset){
     int num_frames=memory_to_allocate/frame_size;
     unsigned long long physical_address;
     // vector<pair<unsigned long long,unsigned long long>> frames_to_allocate; //vector of frames
@@ -109,15 +109,16 @@ unsigned long long frames_allocator(vector<unsigned long long>* free_frame_numbe
 
 void IOmanager(string trace_file_path){
     //mapping
+    long long memory_for_page_tables=0;
     unordered_map<string,unsigned long long> memory_map;
     unsigned long long total_memory_allocated=0;
-    int num_page_table_hits=0;
-    int num_page_table_miss=0;
-    int num_keys=0;
+    long num_page_table_hits=0;
+    long num_page_table_miss=0;
+    long num_keys=0;
     vector<string> memory_keys;
-    vector<unsigned long long> free_frame_numbers=physical_frames_numbers(PHYSICAL_MEMORY_START,PHYSICAL_MEMORY_LAST,PAGE_SIZE);
-    vector<unsigned long long> allocated_frame_numbers={};
-    unordered_map<string,unsigned long long*> program_to_page_table; //mapping from program to respective page table
+    vector<unsigned long> free_frame_numbers=physical_frames_numbers(PHYSICAL_MEMORY_START,PHYSICAL_MEMORY_LAST,PAGE_SIZE);
+    vector<unsigned long> allocated_frame_numbers={};
+    unordered_map<string,unsigned long*> program_to_page_table; //mapping from program to respective page table
     ifstream traceFile(trace_file_path);
     if (!traceFile) {
         std::cerr << "Error: Could not open the file!" << std::endl;
@@ -128,8 +129,8 @@ void IOmanager(string trace_file_path){
     int count=0;
     while (getline(traceFile, line)) {
         count+=1;
-        vector<unsigned long long>* free_frame__numbers_address=&free_frame_numbers;
-        vector<unsigned long long>* allocated_frame_numbers_address=&allocated_frame_numbers;
+        vector<unsigned long>* free_frame__numbers_address=&free_frame_numbers;
+        vector<unsigned long>* allocated_frame_numbers_address=&allocated_frame_numbers;
         stringstream ss(line);
         string task, address, size;
 
@@ -138,8 +139,8 @@ void IOmanager(string trace_file_path){
         getline(ss, address, ':'); // Memory address
         getline(ss, size, ':');    // Size
         string size_type=size.substr(size.length()-2,2);
-        unsigned long long size_allocate=stoull(size.substr(0,size.length()-2));
-        unsigned long long memory_to_allocate;
+        unsigned long size_allocate=stoull(size.substr(0,size.length()-2));
+        unsigned long memory_to_allocate;
         if(size_type=="KB"){
             memory_to_allocate=size_allocate<<10;
         }
@@ -180,8 +181,9 @@ void IOmanager(string trace_file_path){
         else{
             num_keys+=1;
             num_page_table_miss+=1;
-            program_to_page_table[task]=new unsigned long long[VIRTUAL_MEMORY_SIZE/PAGE_SIZE];
-            for(long long i=0;i<VIRTUAL_MEMORY_SIZE/PAGE_SIZE;i++){
+            memory_for_page_tables+=sizeof(unsigned long)*VIRTUAL_MEMORY_SIZE/PAGE_SIZE;
+            program_to_page_table[task]=new unsigned long[VIRTUAL_MEMORY_SIZE/PAGE_SIZE];
+            for(long i=0;i<VIRTUAL_MEMORY_SIZE/PAGE_SIZE;i++){
                 program_to_page_table[task][i]=0;
             }
             total_memory_allocated+=memory_to_allocate;
@@ -206,7 +208,7 @@ void IOmanager(string trace_file_path){
     }
     cout<<"=============================================="<<endl;
     cout<<"count:"<<count<<endl;
-        for(int i=0;i<memory_keys.end()-memory_keys.begin();i++){
+        for(long long i=0;i<memory_keys.end()-memory_keys.begin();i++){
             cout<<memory_keys[i]<<":"<<memory_map[memory_keys[i]]<<endl;
         }
         cout<<"Page hits:"<<num_page_table_hits<<endl;
@@ -214,6 +216,7 @@ void IOmanager(string trace_file_path){
         cout<<"Total memory:"<<PHYSICAL_MEMORY_SIZE<<endl;
         cout<<"Total memory allocated:"<<total_memory_allocated<<endl;
         cout<<"Free Memory:"<<PHYSICAL_MEMORY_SIZE-total_memory_allocated<<endl;
+        cout<<"Memory took for page tables:"<<memory_for_page_tables<<endl;
     traceFile.close();
 }
 
