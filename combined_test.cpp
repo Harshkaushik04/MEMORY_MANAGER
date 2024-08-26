@@ -6,7 +6,7 @@
 #include<vector>
 #include<ctime>
 #include<cmath>
-#include "config_1.h"
+#include "config_2.h"
 using namespace std;
 //task module
 class task{
@@ -390,6 +390,9 @@ void IOmanager_single_level_page_table(string trace_file_path,int verbose){
         // cout << "Size: " << size << endl;
         // cout << endl;
     }
+    for(int i=0;i<memory_keys.end()-memory_keys.begin();i++){
+        delete[] program_to_page_table[memory_keys[i]];
+    }
     clock_t end=clock();
     cout<<"=============================================="<<endl;
     cout<<"count:"<<count<<endl;
@@ -551,19 +554,20 @@ void IOmanager_double_level_page_table(string trace_file_path,int verbose){
         else{
             num_keys+=1;
             num_page_table_miss+=1;
-            program_to_first_level_page_table[new_task.task_id]=new unsigned long long*[0x1000];
             if((int)(log2(VIRTUAL_MEMORY_SIZE)-log2(PAGE_SIZE))%2==0){
-                for(long i=0;i<pow(2,(int)(log2(VIRTUAL_MEMORY_SIZE)-log2(PAGE_SIZE))/2);i++){ //making 2D array
-                    program_to_first_level_page_table[new_task.task_id][i]=new unsigned long long[0x1000];
-                    for(long j=0;j<pow(2,(int)(log2(VIRTUAL_MEMORY_SIZE)-log2(PAGE_SIZE))/2);j++){
+                program_to_first_level_page_table[new_task.task_id]=new unsigned long long*[(int)pow(2,(int)(log2(VIRTUAL_MEMORY_SIZE)-log2(PAGE_SIZE))/2)];
+                for(long i=0;i<(int)pow(2,(int)(log2(VIRTUAL_MEMORY_SIZE)-log2(PAGE_SIZE))/2);i++){ //making 2D array
+                    program_to_first_level_page_table[new_task.task_id][i]=new unsigned long long[(int)pow(2,(int)(log2(VIRTUAL_MEMORY_SIZE)-log2(PAGE_SIZE))/2)];
+                    for(long j=0;j<(int)pow(2,(int)(log2(VIRTUAL_MEMORY_SIZE)-log2(PAGE_SIZE))/2);j++){
                         program_to_first_level_page_table[new_task.task_id][i][j]=0;
                     }
                 }
             }
             else{
-                for(long i=0;i<pow(2,(int)(log2(VIRTUAL_MEMORY_SIZE)-log2(PAGE_SIZE))/2+1);i++){ //making 2D array
-                    program_to_first_level_page_table[new_task.task_id][i]=new unsigned long long[0x1000];
-                    for(long j=0;j<pow(2,(int)(log2(VIRTUAL_MEMORY_SIZE)-log2(PAGE_SIZE))/2);j++){
+                program_to_first_level_page_table[new_task.task_id]=new unsigned long long*[(int)pow(2,(int)(log2(VIRTUAL_MEMORY_SIZE)-log2(PAGE_SIZE))/2+1)];
+                for(long i=0;i<(int)pow(2,(int)(log2(VIRTUAL_MEMORY_SIZE)-log2(PAGE_SIZE))/2+1);i++){ //making 2D array
+                    program_to_first_level_page_table[new_task.task_id]=new unsigned long long*[(int)pow(2,(int)(log2(VIRTUAL_MEMORY_SIZE)-log2(PAGE_SIZE))/2)];
+                    for(long j=0;j<(int)pow(2,(int)(log2(VIRTUAL_MEMORY_SIZE)-log2(PAGE_SIZE))/2);j++){
                         program_to_first_level_page_table[new_task.task_id][i][j]=0;
                     }
                 }
@@ -591,6 +595,18 @@ void IOmanager_double_level_page_table(string trace_file_path,int verbose){
         // cout << "Size: " << size << endl;
         // cout << endl;
     }
+    for(int i=0;i<memory_keys.end()-memory_keys.begin();i++){
+        if((int)(log2(VIRTUAL_MEMORY_SIZE)-log2(PAGE_SIZE))%2==0){
+                for(int j=0;j<(int)pow(2,(int)(log2(VIRTUAL_MEMORY_SIZE)-log2(PAGE_SIZE))/2);j++){
+                    delete[] program_to_first_level_page_table[memory_keys[i]][j];
+                }
+            }
+            else{
+                for(int j=0;j<(int)pow(2,(int)(log2(VIRTUAL_MEMORY_SIZE)-log2(PAGE_SIZE))/2+1);j++){
+                    delete[] program_to_first_level_page_table[memory_keys[i]][j];
+                }
+            }
+    }
     clock_t end=clock();
     cout<<"=============================================="<<endl;
     cout<<"count:"<<count<<endl;
@@ -614,10 +630,10 @@ int main(){
     cout<<"Set verbose:(0 for for showing memory allocation,1 for showing)"<<endl;
     cin>>verbose;
     //mapping
-    IOmanager_mapping("tracefile_1KB_8GB_16GB.txt",verbose);
+    IOmanager_mapping("tracefile_1KB_8GB_16GB_1000.txt",verbose);
     //single level page table
-    IOmanager_single_level_page_table("tracefile_1KB_8GB_16GB.txt",verbose);
+    IOmanager_single_level_page_table("trace_1KB_8GB_16GB_10000.txt",verbose);
     //double level page table
-    IOmanager_double_level_page_table("tracefile_1KB_8GB_16GB.txt",verbose);
+    IOmanager_double_level_page_table("trace_1KB_8GB_16GB_10000.txt",verbose);
     return 0;
 }
