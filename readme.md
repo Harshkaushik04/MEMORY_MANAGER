@@ -24,8 +24,8 @@ Time taken for mapping,other performance module things:
 
 (1) 1000 lines of instructions:
 
-![](media/media/image1.png){width="6.268055555555556in"
-height="3.5256944444444445in"}
+![image1](https://github.com/user-attachments/assets/00cde877-9215-45cb-bb72-4fc23b03c869)
+
 
 Mapping took about 300 sec, by extrapolation(since it's a linear
 process), it would take about 300000 sec for 1000000 lines of
@@ -46,19 +46,19 @@ Time taken for single level page table,other performance module things:
 
 (1) 1000 lines of instruction:
 
-![](media/media/image2.png){width="6.268055555555556in"
-height="3.5256944444444445in"}
+![image2](https://github.com/user-attachments/assets/038cd45e-daa6-4678-81cd-b6eac3eaafce)
+
 
 Single level page table for 1000 lines took 30.9 sec for memory
 allocation.
 
 (2) 10000 lines of instruction
 
-![](media/media/image3.png){width="6.268055555555556in"
-height="3.5256944444444445in"}
+![image3](https://github.com/user-attachments/assets/30e18503-c8a6-49a6-b891-4401f5dcc905)
 
-![](media/media/image4.png){width="6.268055555555556in"
-height="3.5256944444444445in"}
+![image4](https://github.com/user-attachments/assets/2524b700-39fd-4249-81a9-7dd1deeb5f11)
+
+
 
 Single level page table memory allocation for 10000 lines toom about 300
 sec.
@@ -89,18 +89,19 @@ Time taken for single level page table,other performance module things:
 
 (1) 1000 lines of instruction:
 
-![](media/media/image5.png){width="6.268055555555556in"
-height="3.5256944444444445in"}
+![image5](https://github.com/user-attachments/assets/a24badca-34ae-4929-bc6d-031097baa583)
+
+
 
 Time taken for 1000 lines of instruction: 31.9 sec
 
 (2)10000 lines of instructions:
+![image6](https://github.com/user-attachments/assets/3d57a660-0ae3-4029-8351-cb8386eab22c)
 
-![](media/media/image6.png){width="6.268055555555556in"
-height="3.5256944444444445in"}
 
-![](media/media/image7.png){width="6.268055555555556in"
-height="3.5256944444444445in"}
+![image7](https://github.com/user-attachments/assets/6f023de6-4c8f-4663-8335-7bcccd82cbd5)
+
+
 
 Time taken for 10000 lines of instructions:335.74sec
 
